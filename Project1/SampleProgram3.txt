@@ -1,0 +1,8 @@
+$$ A program to calculate the average of any number of integers. This is made to display that the application domain is not just drones, but any other program can be written. $$
+int x = in();
+int val = 0;
+
+for int i = 0, i < x, i++ ??
+	val += in();
+	endfor
+out(val / x);

@@ -1,0 +1,59 @@
+$$ This program includes useful functions for a drone company to use in their implementations. $$
+
+
+fnc::void startNozzle(bool flag, int time){
+	is tank.getVolume() == 0 ??
+		is flag == true??
+			return;
+		endis
+		return;
+	endis
+	tank.startSpray();
+	tank.setVolume(tank.getVolume - time * tank.getSpeed());
+}
+
+$$ This function connects the drone to the base computer with a given network name and network password for wi-fi. Different helper functions are called for Desktop and mobile base computers. $$
+fnc::bool connect(string network_name, string network_pass, bool isDesktop){
+	is isDesktop ??
+		return connectToDesktop(network_name, network_pass);
+	endis
+	else ??
+		return connectToMobile(network_name, network_pass);
+	endelse
+	return false;
+}
+
+fnc::bool connectToDesktop(string network_name, string network_pass){
+	bool flag = doesWifiExist(network_name, drone.getRange());
+	is flag == true??
+		drone.connect(network_name,network_pass);
+		return true;
+	endis
+	else ??
+		return false;
+	endelse
+} 
+
+fnc::bool connectToMobile(string network_name, string network_pass){
+	bool flag = doesWifiExist(network_name, drone.getRange());
+	is flag == true??
+		drone.connect(network_name,network_pass);
+		return true;
+	endis
+	else ??
+		return false;
+	endelse
+} 
+
+fnc::bool doesWifiExist(string s, int r)
+{
+	$$ looks around the radius for available wifis and returns true if there is one with the same name$$
+	for int i = 0, i < r^2, i++ ??
+		is Router.getName() == s ??
+			return true;
+		endis
+	endfor
+	$$ if the function comes to this point, it couldn't find the wifi so it does not exist $$
+	return false;
+}
+

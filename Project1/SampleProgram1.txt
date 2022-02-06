@@ -1,0 +1,98 @@
+$$ This program makes the drone spray in a user specified region $$
+
+$$ direction should be 1 for moving forward, -1 for moving backward and 0 for stopping $$
+fnc::void goHorizontal(int meters, int direction){
+	int distanceTraveled = 0;
+	move_horizontal(direction);
+	while distanceTraveled  < meters ??
+		timer(); $$ program waits for one second $$
+		distanceTraveled++;
+	endwhile
+	$$ drone went the amount we wanted at this point, so we stop the drone $$
+	move_horizontal(0);
+}
+
+$$ direction should be 1 for moving upwards, -1 for moving downwards and 0 for stopping $$
+fnc::void goVertical(int meters, int direction){
+	is direction != 0 ??
+		int initialHeight = barometer.getAltitude();
+		move_vertical(direction);
+
+		$$ If moving downwards, direction is -1 and (barometer.getAltitude() - initialHeight) value will be negative so we multiply by direction $$
+		while direction*(barometer.getAltitude() - initialHeight) < meters ??
+		endwhile
+	endis
+	$$ drone went the amount we wanted at this point, so we stop the drone $$
+	move_vertical(0);
+}
+
+
+$$ Program start $$
+out("Welcome, this program allows the drone to spray in a rectangular area.\n");
+out("Note: It assumes that the drone is already positioned on the bottom left corner of the field.\n");
+out("The current temperature outside is: ");
+out(getTemperature());
+out(" degrees Celcius\n");
+
+out("Are you sure you want to irrigate the field? Enter Y for yes, N for no:");
+string input = in();
+while input != "Y" || input != "N" ??
+	out("Error: Invalid input, please type Y or N:\n");
+	input = in();
+endwhile
+
+is input == "N" ??
+	out("Ending program...\n");
+endis
+or input == "Y" ??
+	out("Please enter the x dimension of the field:\n");
+	int x = in();
+	while x < 0 ??
+		out("x must be positive. Please re enter x:\n");
+		x = in();
+	endwhile
+
+	out("Please enter the y dimension of the field:\n");
+	int y = in();
+	while x < 0 ??
+		out("y must be positive. Please re enter x:\n");
+		y = in();
+	endwhile
+	
+	goVertical(10, 1); $$ Drone will spray from a height of 10 meters. $$
+	
+	toggle_spray(true); $$ Start the spray of the drone. $$
+	out("The drone has started irrigating. \n");
+
+	for int i = 0; i < x / 2; i++ ??
+		$$ Turn the drone 90 degrees $$
+		while getHeading() != 90 ??
+			turn(true);
+		endwhile
+
+		goHorizontal(y,1); $$ spray for y meters $$
+		
+		while getHeading() != 0 ??
+			turn(false);
+		endwhile
+		
+		goHorizontal(1,1); $$ spray for one meter upwards $$
+		
+		while getHeading() != 270 ??
+			turn(true);
+		endwhile
+		
+		goHorizontal(y,1); $$ spray for y meters $$
+
+		while getHeading() != 0 ??
+			turn(true);
+		endwhile
+
+		goHorizontal(1,1); $$ spray for one meter upwards $$
+	endfor
+
+	toggle_spray(false); $$ Start the spray of the drone. $$
+	out("The irrigation is done.");
+	
+	goVertical(10, -1); $$ Drone return to the ground. $$
+endor
